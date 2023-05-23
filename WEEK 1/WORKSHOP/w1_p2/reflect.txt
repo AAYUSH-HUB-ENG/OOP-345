@@ -1,0 +1,119 @@
+/*
+*********************************************************************************
+Name: Ayush Prasai
+Student ID: 113515209
+Email: Aprasai@myseneca.ca
+Date of Completion: 2023-05-18  
+I have done all the coding by myself and only copied the code that my professor
+provided to complete my workshops and assignments.
+*********************************************************************************
+*/
+
+This workshop was pretty simple and straight, but use of linkage and constexpr were new thing that we used compared to what we learned in OOP244.
+
+********************************************************************************************************************************************************************************************
+
+The main difference between external and internal linkage is in external linkage the variable can be accessed in multiple modules as long as the keyword extern is used but internal linkage can only be accessed within the translation unit in which they are defined.
+External linkage is identified using the keyword extern and internal linkage can be identified using the static keyword.
+In our code the example of external linkage is extern double g_taxrate and extern double g_discount and example of internal linkafe is static int counter.
+
+
+********************************************************************************************************************************************************************************************
+
+Static variables are variable that are defined within the module or functions in which they are initialized.
+
+It is useful in my solution because it ensures that each car is displayed with a unique number, regardless of how many times the 'display' function is called or how many instances of the 'Cars' class exists.It provides a convenient and reliable way to maintain and update a counter within the scope of the display function.
+
+********************************************************************************************************************************************************************************************
+
+The changes that were made in Cars class in part 2 are:
+
+In carads.h 
+char m_brand[11] was changed to char* m_brand and following function were added to ensure ther is no memory leak and the program produces the required result.
+
+~Cars(); // destructor
+		Cars(const Cars& car); //Copy constructor
+		Cars& operator=(const Cars& car); //Copy assignment Constructor
+
+		operator bool() const;
+
+	};
+	std::istream& operator>>(std::istream& is, Cars& car);
+	void operator>>(const Cars& car1, Cars& car2);
+
+In carads.cpp
+
+In default constructor the safe empty state of m_brand was changed form:
+m_brand[0] ='\0';
+TO
+m_brand =nullptr;
+
+
+In the funtion void read(std::istream& is); a new variable string temp was created to be read by the istream and later its value was copied to the m_brand using the following code snippet.
+
+std::string temp;
+std::getline(is, temp, ',');
+m_brand = new char[temp.length() + 1];
+strcpy(m_brand, temp.c_str());
+
+
+Destructor, copy constructor and copy assignment operator was defined as per the request of the assignment to ensure no memory leakage.
+
+Cars::~Cars() {                      //destructor
+		deallocator();
+	}
+
+	Cars::Cars(const Cars& car) {      //copy constructor
+		
+		if (car.m_brand != nullptr) {
+			m_brand = new char[strlen(car.m_brand) + 1];
+			strcpy(m_brand, car.m_brand);
+			strcpy(m_model, car.m_model);
+			m_year = car.m_year;
+			m_price = car.m_price;
+			m_status = car.m_status;
+			m_discount = car.m_discount;
+		}
+		else {
+			m_brand = nullptr;
+		}
+	}
+
+	Cars& Cars::operator=(const Cars& car) {  //copy assignment operator
+		if (this != &car) {
+			deallocator();
+			if (car.m_brand != nullptr) {
+				m_brand = new char[strlen(car.m_brand) + 1];
+				strcpy(m_brand, car.m_brand);
+				strcpy(m_model, car.m_model);
+				m_year = car.m_year;
+				m_price = car.m_price;
+				m_status = car.m_status;
+				m_discount = car.m_discount;
+			}
+			else {
+				m_brand = nullptr;
+			}
+		}
+		return *this;
+	}
+
+And other functions were also implemented as follows.
+
+Cars::operator bool() const {
+		return m_status == 'N';
+	}
+
+	std::istream& operator>>(std::istream& is, Cars& car) {
+		car.read(is);
+		return is;
+	}
+
+	void operator>>(const Cars& car1, Cars& car2) {
+		car2 = car1;
+	}
+
+********************************************************************************************************************************************************************************************
+
+Overall doing this assignment was a blast as it gave me the chance to review the concepts of OOP244 and also learn something new being the internal and external linkage. Although constexpr was also used in the program in main module that was provided by the professsor I didn't get to use it on my own which I would be looking forward to use in the upcoming workshops.
+constexpr are functions what can be evaluated duing the compile time and connot be changed during the runtime. And this function is beneficial to used because it improves the efficiency by permorming the computations at compile time also makes the code much more readable by making the constant value explicit.
