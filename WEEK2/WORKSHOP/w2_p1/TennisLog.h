@@ -24,25 +24,30 @@ namespace sdds {
 		unsigned int m_match_id{};
 		std::string m_winner {};
 		std::string m_loser {};
-
-		friend std::ostream& operator<<(std::ostream& os, const TennisMatch& match);
-		TennisMatch& operator = (const TennisMatch& match);
 	};
+	std::ostream& operator<<(std::ostream& os, const TennisMatch& match);
 
-    class TennisLog {
+	class TennisLog {
 		TennisMatch* m_matches{};
-		size_t m_numOfMatches{};
+		int m_numOfMatches{};
 
-    public:
-        TennisLog();
-        ~TennisLog();
+
+	public:
+		TennisLog();
 		TennisLog(const std::string filename);
 		void addMatch(const TennisMatch& match);
 		TennisLog findMatches(const std::string& playerName);
 		const TennisMatch& operator[](size_t index) const;
 		operator size_t() const;
-    };
-	
+
+		//Rule of Five
+		//TennisLog(const TennisLog& gameLog); //copy constructor
+		//TennisLog(TennisLog&& gamelog); // move constructor
+		//TennisLog& operator=(const TennisLog& matchLog); // copy assignment operator
+		//TennisLog& operator= (TennisLog&& matchLog); //move assignment operator
+		~TennisLog(); //destructor
+	};
+
 }
 
 
