@@ -1,0 +1,107 @@
+/*
+*********************************************************************************
+Name: Ayush Prasai
+Student ID: 113515209
+Email: Aprasai@myseneca.ca
+Date of Completion: 2023-05-28
+I have done all the coding by myself and only copied the code that my professor
+provided to complete my workshops and assignments.
+*********************************************************************************
+*/
+
+In this workshop we read a file named tennis-data.csv and manipulated it to present the desirable output as requested by the teacher in w2_p2.cpp.
+
+The most challanging part about this workshop was to manage memory without any leaks and reading the file as well. Since we had to read the file twice, first to count the number of lines/matches that was held and secondly to read the data of the file.
+Which I did using the TennisLog constructor.
+
+TennisLog::TennisLog(const char* filename) {
+        m_numOfMatches = 0;
+        std::ifstream in(filename);
+        string line;
+        while (getline(in, line)) {   //go through the file line by line 
+            m_numOfMatches++;
+        }
+        m_numOfMatches -= 1;    //don't count the heading line in the file
+        m_matches = new TennisMatch[m_numOfMatches];   //allocate dynamic memory for the array of matches based on the number found
+
+        //How to rewind an ifstream object after hitting the end of file? Use seekg sets the cursor position. https://stackoverflow.com/questions/28331017/rewind-an-ifstream-object-after-hitting-the-end-of-file
+        in.clear();
+        in.seekg(0);   //reread the file from the beginning by seekg(0): https://www.geeksforgeeks.org/set-position-with-seekg-in-cpp-language-file-handling/#:~:text=seekg()%20is%20a%20function,stream%20from%20a%20given%20file.
+
+        //In a .csv file, the cells are separated by ',', while the rows end with a '\n', the rest is like a regular .txt file
+        in.ignore(256, '\n');   //ignore until the end of the first line
+        int i = 0;
+        while (getline(in, line)) {   //go through the file line by line 
+            stringstream sstr(line);
+            string c_m_tournament_id, c_m_tournament_name, c_m_match_id, c_m_winner, c_m_loser;
+
+            getline(sstr, c_m_tournament_id, ',');
+            getline(sstr, c_m_tournament_name, ',');
+            getline(sstr, c_m_match_id, ',');
+            getline(sstr, c_m_winner, ',');
+            getline(sstr, c_m_loser);
+
+            m_matches[i].m_tournament_id = c_m_tournament_id;
+            m_matches[i].m_tournament_name = c_m_tournament_name;
+            m_matches[i].m_match_id = stoi(c_m_match_id);
+            m_matches[i].m_winner = c_m_winner;
+            m_matches[i].m_loser = c_m_loser;
+
+            i++;
+        }
+
+        in.close();
+    }
+
+In the first part since I didnt use the rule of 5. Memory management was easier compared to the second part as we have to delelte all the objects data from which we moved the data and also use of move function was done. Which was done like this:
+    TennisLog& TennisLog::operator=(TennisLog&& TL) noexcept {
+
+        if (this != &TL) {
+            delete[] m_matches;
+            m_numOfMatches = TL.m_numOfMatches;
+            TL.m_numOfMatches = 0;
+            m_matches = TL.m_matches;
+            TL.m_matches = nullptr;
+        }
+
+        return *this;
+    }
+
+    TennisLog::TennisLog(TennisLog&& TL) noexcept {
+        *this = move(TL);
+    }
+********************************************************************************************************************************************************************************************
+Upon completeing this workshop the abilities that i learned are:
+retrieve records from a text file using an input file stream object.
+count the number of records in a text file.
+monitor the time spent on a particular task using the std::chrono library.
+implement copy semantics for a class with a resource.
+implement move semantics for a class with a resource.
+identify the processing-intensive operations in copy and move assignments.
+
+********************************************************************************************************************************************************************************************
+The reason for the time difference between move and copy operations is because we had to move the data to another object and also delete the current object on the other hand we simply had to copy the data to another object in copy operator.
+********************************************************************************************************************************************************************************************
+To read the input file the Constructor with the filename paramater was used which is shown in above. We can avoid reading the file if we simply donot put the file in our list of arguments.
+********************************************************************************************************************************************************************************************
+steady_clock:
+*******************
+The steady_clock is a monotonic clock that represents a steady, non-adjustable time source. It ensures that the time values always increase at a constant rate.
+The steady_clock is not affected by system clock adjustments, such as manual time changes or daylight saving time (DST) transitions.
+It is primarily used for measuring durations and intervals accurately, especially when the absolute time is not important, but relative time measurements are crucial.
+Examples of use cases for steady_clock include performance measurements, timing algorithms, or measuring intervals between events.
+
+system_clock:
+*******************
+The system_clock represents the current time according to the system's clock. It includes both the time and date information.
+The system_clock is subject to adjustments made by the operating system, including manual time changes and DST transitions.
+It is typically used when you need to work with the actual time and date information, such as displaying the current time, scheduling tasks, or dealing with time-sensitive operations.
+
+The system_clock provides functions to convert its time points to human-readable time representations, like std::ctime().
+In summary, the key differences between steady_clock and system_clock are their behavior regarding system clock adjustments and their primary use cases. The steady_clock is steady and unaffected by system clock changes, making it suitable for accurate duration measurements. On the other hand, the system_clock reflects the current time according to the system and is used when dealing with real-world time and date information.
+********************************************************************************************************************************************************************************************
+Citation:
+https://www.modernescpp.com/index.php/the-three-clocks
+https://www.appsloveworld.com/cplus/100/4/difference-between-stdsystem-clock-and-stdsteady-clock
+https://www.youtube.com/watch?v=zSzYcbhQjMo
+
